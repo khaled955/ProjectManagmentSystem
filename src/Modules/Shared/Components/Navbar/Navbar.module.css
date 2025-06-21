@@ -1,0 +1,20 @@
+
+
+
+
+
+
+
+
+.customFixedPosition{
+    z-index:100000;
+}
+
+
+
+/* 
+@media screen and (min-width:576px){
+    .customFixedPosition{
+        position:fixed;
+    }
+} */

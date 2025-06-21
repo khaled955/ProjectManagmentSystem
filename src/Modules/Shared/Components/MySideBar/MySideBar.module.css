@@ -1,0 +1,51 @@
+
+
+
+.customTopPosition{
+    top: 130px;
+    
+}
+
+
+.arrowPosition{
+    /* left:0; */
+
+    z-index: 1000000;
+    top: 0;
+}
+
+
+@media screen and (max-width: 575px) {
+  
+
+}
+
+
+
+.smallSize{
+    width: 80px;
+    transition: width .3s;
+}
+.largSize{
+    width:240px;
+    transition: width .3s;
+}
+
+
+@media screen and (min-width:567px) {
+ .customTopPosition{
+    top: 90px;
+ }   
+}
+
+
+
+
+
+
+
+
+
+
+
+

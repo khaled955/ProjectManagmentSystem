@@ -1,0 +1,170 @@
+/*  General Form Styles */
+input::placeholder , select{
+    color: gray;
+}
+
+input[type="search"]{
+    outline: none;
+}
+
+.auth-btn{
+    width: 100%;
+    padding: 4px 1px;
+    color: white;
+    transition: all .3s;
+    background-color: #f09f29;
+    border: 0;
+    outline: 0;
+    border-radius: 5px;
+}
+
+.auth-btn:hover{
+    background-color:#d6850f;
+}
+
+
+
+
+
+.fa-eye-slash , .fa-eye ,.fa-circle-xmark{
+    cursor: pointer;
+}
+
+
+
+.side-bar-container{
+ padding-top:90px ;
+
+
+   .css-dip3t8{
+    background-color: #1F263E;
+    color: white;
+   }
+
+
+   li.ps-menuitem-root a:hover{
+    background-color:#EF9B284D;
+   }
+   li.ps-menuitem-root:nth-child(1) a:hover{
+    background-color: transparent;
+   }
+
+
+  
+
+
+   
+}
+
+
+
+
+
+@media screen and (max-width:580px){
+
+.side-bar-container , .outlet-container{
+    padding-top: 130px;
+}
+
+
+
+
+
+}
+
+
+.outlet-collapse{
+    width: calc(100% - 250px);
+    margin-left: auto;
+}
+
+
+.collapsedlayout{
+width: calc(100% - 80px);
+}
+
+.uncollapsedlayout{
+    width:calc(100% - 240px)
+}
+
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+
+
+.custom-btn{
+    padding: 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #d6850f;
+}
+
+
+
+
+
+
+/*  loading spinner style */
+
+.custom-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-loading-spinner {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-loading-spinner > div {
+  width: 18px;
+  height: 18px;
+  margin: 0 6px;
+  background-color: #0d6efd;
+  border-radius: 100%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.custom-loading-spinner .bounce1 {
+  animation-delay: -0.32s;
+}
+
+.custom-loading-spinner .bounce2 {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loading-text {
+  font-weight: 500;
+  color: #0d6efd;
+}
+
+
+
+

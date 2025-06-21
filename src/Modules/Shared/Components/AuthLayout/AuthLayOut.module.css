@@ -1,0 +1,9 @@
+
+.authContainer{
+    background-image: linear-gradient(45deg , rgba(3, 49, 46, .7)
+,rgba(22, 22, 22, 0.7)) ,url("../../../../assets/images/Vector.svg");
+background-position: center;
+background-size: cover;
+background-repeat: no-repeat;
+min-height: 100vh;
+}
