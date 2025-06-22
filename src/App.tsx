@@ -14,6 +14,7 @@ import MasterLayOut from "./Modules/Shared/Components/MasterLayOut/MasterLayOut"
 import ProjectList from "./Modules/Project/Components/ProjectList/ProjectList"
 import TasksList from "./Modules/Tasks/Components/TasksList/TasksList"
 import UsersList from "./Modules/Users/Components/UsersList/UsersList"
+import DisplayProfile from "./Modules/Profile/Components/DisplayProfile/DisplayProfile"
 
 
 function App() {
@@ -34,6 +35,7 @@ const routes = createBrowserRouter([{path:"/" , element:<AuthLayOut/>,children:[
   {path:"users" , element:<UsersList/>},
   {path:"projects" , element:<ProjectList/>},
   {path:"tasks" , element:<TasksList/>},
+  {path:"profile" , element:<DisplayProfile/>},
   {path:"*" , element:<NotFound/>},
 ]}
 

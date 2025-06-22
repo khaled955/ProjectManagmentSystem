@@ -1,6 +1,6 @@
 import styles from "./Register.module.css"
 import { useForm } from "react-hook-form";
-import photo from "../../../../assets/images/th.jpeg";
+import photo from "../../../../assets/images/register-img.png";
 import { EMAIL_VALIDATION } from "../../../../Services/Validation";
 import type { FormInfo } from "../../../../Interfaces/Interfaces";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
 import { AUTHENTICATION_URL } from "../../../../Services/URL";
 import axiosInstance from "../../../../Services/AxiosInstance";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const countriesList = Object.values(countries)
   .map((country) => ({ Countryname: country.name, countryPhone: country.phone[0] }))
@@ -358,6 +358,7 @@ return ()=> URL.revokeObjectURL(previewUrl)
           {isSubmitting ? <i className="fa-solid fa-spinner fa-spin"></i> : "Save"}
         </button>
       </form>
+      <Link className="text-white text-decoration-none fw-bolder" to="/login"> login ?</Link>
     </main>
   );
 }

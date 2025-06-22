@@ -72,7 +72,6 @@ fetchUsers()
 
 
 
-
 const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
 
   return (
@@ -90,9 +89,7 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
 
 {/*  input for title */}
 <form className="py-3" onSubmit={handleSubmit( async (data)=>{
-
-
-
+ 
 
   if(taskFormtitle.startsWith("Add")) {
     await handleCreateNewTask(data)
@@ -133,8 +130,8 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
 <div className="row">
 {/* input for users */}
 <div className="users-input mb-3 col-md-6">
-  <label htmlFor="employee"> Users</label>
-  <select className="form-control" id="employee"
+  <label htmlFor="employeeId"> Users</label>
+  <select className="form-control"
   {...register("employeeId",{required:"Select The User"})}
   
   
@@ -142,7 +139,7 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
     <option value=""> Select Employee</option>
 
 
-{usersList.length > 0 ? usersList.sort((a:User,b:User)=> a.userName.localeCompare(b.userName)).map((user:User)=>{
+{usersList.length > 0 ?usersList.filter((user:User)=> user.isActivated).sort((a:User,b:User)=> a.userName.localeCompare(b.userName)).map((user:User)=>{
   return <option value={user.id} key={user.id}>{user.userName}</option>
 }):""}
 
@@ -154,8 +151,8 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
 
 {/* input for projects */}
 <div className="project-input mb-3 col-md-6">
-  <label htmlFor="projects"> Projects</label>
-  <select className="form-control" id="projects"
+  <label htmlFor="projectId"> Projects</label>
+  <select className="form-control"
   {...register("projectId",{required:"Select The Project"})}
   
   

@@ -38,6 +38,7 @@ export default function MySideBar({ collapsed, handleCollapse }: { handleCollaps
           <MenuItem icon={<i className="fa-solid fa-users"></i>} component={<Link to="/dashboard/users" />}> Users</MenuItem>
           <MenuItem icon={<i className="fa-solid fa-chart-simple"></i>} component={<Link to="/dashboard/projects" />}> Projects</MenuItem>
           <MenuItem icon={<i className="fa-solid fa-list-check"></i>} component={<Link to="/dashboard/tasks" />}> Tasks</MenuItem>
+          <MenuItem icon={<i className="fa-solid fa-id-card"></i>} component={<Link to="/dashboard/profile" />}> Profile</MenuItem>
           <MenuItem onClick={logOut} icon={<i className="fa-solid fa-right-from-bracket"></i>}> LogOut</MenuItem>
         </Menu>
       </Sidebar>

@@ -161,7 +161,7 @@ const handleHideTaskForm = useCallback(function (){
 
 
 
-const handleCreateNewTask = useCallback( async (dataInfo:AddTaskProps)=>{
+const handleCreateNewTask = useCallback( async function(dataInfo:AddTaskProps){
 
 
 
@@ -181,8 +181,6 @@ try {
   const {data} = await axiosInstance.request(options)
   console.log(data)
 toast.success("New Task Created Successfully")
-handleHideTaskForm()
-setCurrentPage(1)
    await fetchTasks()
 } catch (error) {
   if(isAxiosError(error))
@@ -190,15 +188,15 @@ setCurrentPage(1)
 }finally{
   toast.dismiss(toastId)
   setTimeout(()=>{
-    handleHideTaskCard()
-  },1500)
+    handleHideTaskForm()
+  },1000)
 }
 
 
 
 
 
-},[handleHideTaskCard,fetchTasks,handleHideTaskForm])
+},[fetchTasks,handleHideTaskForm])
 
 
 
