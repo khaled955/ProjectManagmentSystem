@@ -9,7 +9,7 @@ import { isAxiosError } from "axios";
 import { AUTHENTICATION_URL } from "../../../../Services/URL";
 import axiosInstance from "../../../../Services/AxiosInstance";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../../Context/Auth.context";
+import { useAuth } from "../../../../Hooks/useAuth";
 
 
 
@@ -31,7 +31,7 @@ const {setToken} = useAuth()
     formState: { errors, isSubmitting },
   } = useForm<FormLoginProps>({ mode: "onChange" });
 
-  async function login(info: FormLoginProps) {
+   const login = async function(info: FormLoginProps) {
     const toastId = toast.loading("Waiting....");
 
     try {
@@ -41,17 +41,38 @@ const {setToken} = useAuth()
         data: info,
       };
       const { data } = await axiosInstance.request(options);
-      localStorage.setItem("userToken", data.token);
+    if(!data.message && data.token){
+ 
+ localStorage.setItem("userToken", data.token);
       setToken(data.token)
       toast.success("Login Successfully 👌");
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
       setErrorMessage(null);
+
+
+
+
+
+
+    }else{
+
+
+      setErrorMessage(data.message)
+
+
+    }
+
+
+
     } catch (error) {
+
       if (isAxiosError(error)) {
         toast.error(error?.response?.data.message || "Something went wrong!");
         setErrorMessage(error.response?.data.message || "Something went wrong!");
+
+  
       }
     } finally {
       toast.dismiss(toastId);

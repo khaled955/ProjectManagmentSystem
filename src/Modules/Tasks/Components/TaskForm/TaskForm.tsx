@@ -12,24 +12,23 @@ const [usersList , setUsersList] = useState<User[] | []>([])
 const [projectsList , setProjectsList] = useState<Project[]| []>([])
 
 const {formState:{isSubmitting,errors},register ,handleSubmit} = useForm<AddTaskProps>({mode:"onChange",defaultValues:{
-title:currentTask?.title || "",
-description:currentTask?.description || "",
-employeeId:currentTask?.employee.id.toString() ,
-projectId:currentTask?.project.id.toString(), 
+title: currentTask && currentTask.title || "",
+description: currentTask && currentTask?.description || "",
+employeeId: currentTask && currentTask?.employee.id.toString() ,
+projectId: currentTask  && currentTask.project.id? currentTask.project.id.toString(): "", 
 
 }})
 
 
 
 
-
-// fetch all Projects
+// fetch all for manager Projects
 useEffect(()=>{
 
 async function fetchProjects(){
 
   try {
-    const {data} = await axiosInstance.get(PROJECTS_URL.GET_PROJECTS_FOR_TASKS_FORM(10,1))
+    const {data} = await axiosInstance.get(PROJECTS_URL.GET_PROJECTS_FOR_MANAGER_FOR_CREATE_TASKS(100))
     setProjectsList(data.data)
     
   } catch (error) {
@@ -76,8 +75,8 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
 
   return (
    <section className=' position-fixed top-0 bottom-0 start-0 end-0 row justify-content-center align-items-center' style={{zIndex:99999 ,backgroundColor:"#42696180"}}>
-<div className="bg-white rounded-2 position-relative col-md-6">
-  <div className="close-btn position-absolute top-0 end-0">
+<div className="bg-white rounded-2 position-relative col-md-6 p-3 overflow-y-auto">
+  <div className="close-btn position-absolute top-0 end-0 me-3 me-md-0">
 <i onClick={handleHideTaskForm} className="fa-solid fa-circle-xmark fs-5"></i>
   </div>
    <header>
@@ -136,7 +135,7 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
   
   
   >
-    <option value=""> Select Employee</option>
+    <option disabled value=""> Select Employee</option>
 
 
 {usersList.length > 0 ?usersList.filter((user:User)=> user.isActivated).sort((a:User,b:User)=> a.userName.localeCompare(b.userName)).map((user:User)=>{
@@ -157,7 +156,7 @@ const btnText = taskFormtitle.startsWith("Add") ? "Save":"Update Now"
   
   
   >
-    <option value=""> Select Project</option>
+    <option disabled value=""> Select Project</option>
 
 
 {projectsList.length > 0 ? projectsList.map((project:Project)=>{

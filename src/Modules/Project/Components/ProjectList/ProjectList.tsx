@@ -1,7 +1,7 @@
 import { Dropdown } from 'react-bootstrap';
 import { BsThreeDotsVertical, BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import type { AddProjectProps, PaginatedProjectResponse, Project } from '../../../../Interfaces/Project.interface';
+import type { AddProjectProps, Project, ProjectProps } from '../../../../Interfaces/Project.interface';
 import { PROJECTS_URL } from '../../../../Services/URL';
 import axiosInstance from '../../../../Services/AxiosInstance';
 import { isAxiosError } from 'axios';
@@ -13,11 +13,12 @@ import Pagination from '../../../Shared/Components/Pagination/Pagination';
 import debounce from "lodash/debounce";
 import ProjectForm from '../ProjectForm/ProjectForm';
 import ConfirmModal from '../../../Shared/Components/ConfirmModal/ConfirmModal';
-
+import { Helmet } from 'react-helmet-async';
+import { useAuth } from '../../../../Hooks/useAuth';
 
 
 export default function ProjectList() {
-const [projectList , setProjectList] = useState< PaginatedProjectResponse| null>(null)
+const [projectList , setProjectList] = useState< ProjectProps[] | null>(null)
 const [showProjectDetails , setShowProjectDetails] = useState(false)
 const [currentProject , setCurrentProject] = useState<Project | null>(null)
 const [currentPage , setCurrentPage] = useState(1)
@@ -28,7 +29,8 @@ const [seletedProjectId , setSelectedProjectId] = useState< number | null>(null)
 const [searchQuery , setSearchQuery] = useState("")
 const [showProjectForm , setShowProjectForm] = useState(false)
 const [projectFormtitle , setProjectFormTitle] = useState("")
-
+const [isSorted , setIsSorted] = useState(false)
+const {isEmployee} = useAuth()
 
 
 
@@ -38,13 +40,13 @@ const fetchProjects = useCallback( async function(){
 
   try {
     const options = {
-      url:PROJECTS_URL.GET_ALL_PROJECTS(searchQuery,5,currentPage),
+      url: !isEmployee ? PROJECTS_URL.GET_PROJECTS_FOR_MANAGER(searchQuery,5,currentPage) : PROJECTS_URL.GET_PROJECTS_FOR_EMPLOYEE(searchQuery,5,currentPage),
       method:"GET",
 
     }
     
     const {data } = await axiosInstance.request(options)
-       setProjectList(data)
+       setProjectList(data.data)
        setTotalPageNumber(data.totalNumberOfPages)
 
 
@@ -57,7 +59,7 @@ const fetchProjects = useCallback( async function(){
 
 
 
-},[currentPage,searchQuery])
+},[currentPage,searchQuery,isEmployee])
 
 useEffect(()=>{
 fetchProjects()
@@ -105,7 +107,7 @@ const debounceSearchByTitle= useMemo(()=>{
       fetchProjects()
     }
 
-  },300)
+  },100)
   
 
 
@@ -191,7 +193,7 @@ if(dataInfo.title === currentProject.title && dataInfo.description === currentPr
 try {
   
   const options = {
-    url:PROJECTS_URL.UPDATE_PROJECT_BY_ID_BY_MANAGER(currentProject.id),
+    url:PROJECTS_URL.UPDATE_PROJECT_BY_ID_BY_MANAGER(currentProject.id!),
     method:"PUT",
     data:dataInfo,
   }
@@ -219,6 +221,20 @@ toast.success("Project Updated Successfully 👌")
 
 
 
+  // sort function
+ const handleSortUsersByName = useCallback(function () {
+    const sortedUsers = [...(projectList) || []].sort((a:ProjectProps, b: ProjectProps) => a.title!.localeCompare(b.title!));
+    setProjectList(sortedUsers);
+    setIsSorted(true);
+  }, [projectList]);
+
+
+// revers sort function
+  const handleReversUsersByNameToOriginal = useCallback(function () {
+    const originalData = [...(projectList) || []].reverse();
+    setProjectList(originalData);
+    setIsSorted(false);
+  }, [projectList]);
 
 
 
@@ -250,6 +266,14 @@ if(!projectList) return <Loading/>
 
   return (
     <div>
+
+  <Helmet>
+        <title>{`Project List | ${isEmployee ?"User Panel":"Admin Panel"}`}</title>
+        <meta name="description" content="View and manage projects including their status, group, and personal info." />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+
+
 {showProjectDetails && currentProject && <ProjectDetails currentProject={currentProject} handleHideProjectCard={handleHideProjectCard}/>
 }
 
@@ -260,12 +284,12 @@ if(!projectList) return <Loading/>
 
       <div className="project-header px-2 rounded-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
        <h2>Projects</h2>
-       <button onClick={()=>{
+     {!isEmployee && <button onClick={()=>{
         
         setProjectFormTitle("Add a New Project")
         setCurrentProject(null)
         setShowProjectForm(true)
-       }} className="custom-btn"> + Add New Project</button>
+       }} className="custom-btn"> + Add New Project</button>}
       </div>
 
 <div className="filter-box my-4 position-relative">
@@ -277,21 +301,23 @@ if(!projectList) return <Loading/>
 <table className="table table-responsive text-center">
   <thead>
     <tr  >
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Title</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Status</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Num Users</th>
+      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Title {isSorted ? (
+                  <i onClick={handleReversUsersByNameToOriginal} style={{ cursor: "pointer" }} className="fa-solid fa-caret-up" aria-label="Sort descending"></i>
+                ) : (
+                  <i onClick={handleSortUsersByName} style={{ cursor: "pointer" }} className="fa-solid fa-caret-down" aria-label="Sort ascending"></i>
+                )}</th>
+      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Description</th>
       <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Num Tasks</th>
       <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Created Date</th>
       <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Action</th>
     </tr>
   </thead>
   <tbody>
- {projectList.data.length > 0 ?projectList.data.map((project:Project)=> <tr key={project.id}>
+ {projectList.length > 0 ?projectList.map((project:ProjectProps)=> <tr key={project.id}>
   <td className='text-capitalize'>{project.title}</td>
-  <td style={{backgroundColor:"#315951E5" ,color:"white",borderRadius:20}}>Public</td>
-  <td>5</td>
-  <td>15</td>
-  <td>{new Date(project.creationDate).toLocaleTimeString()}</td>
+  <td style={{backgroundColor:"#315951E5" ,color:"white",borderRadius:20}}>{project.description?.split("").slice(0,10).join("")}...</td>
+  <td>{project.task?.length}</td>
+  <td>{project.modificationDate ? new Date(project.modificationDate).toLocaleTimeString():""}</td>
   <td> 
 <Dropdown>
       <Dropdown.Toggle
@@ -305,9 +331,11 @@ if(!projectList) return <Loading/>
       <Dropdown.Menu className="shadow-sm rounded-3">
 
 {/*  view btn */}
-        <Dropdown.Item onClick={()=>{setCurrentProject(project)
+        <Dropdown.Item onClick={()=>{
+           if(project){
+            setCurrentProject(project)
           setShowProjectDetails(true)
-
+           }
         }} >
           <BsEye className="me-2 text-success" />
           View
@@ -318,24 +346,24 @@ if(!projectList) return <Loading/>
  
 
  {/* edit btn */}
-        <Dropdown.Item onClick={()=>{
+     {!isEmployee &&    <Dropdown.Item onClick={()=>{
           setCurrentProject(project)
           setProjectFormTitle(`Update ${project.title}`)
           setShowProjectForm(true)
         }} >
           <BsPencil className="me-2 text-primary" />
           Edit
-        </Dropdown.Item>
+        </Dropdown.Item>}
 
 {/* delet btn */}
-      <Dropdown.Item disabled={isLoading}  onClick={()=>{
-        setSelectedProjectId(project.id)
+     {!isEmployee &&  <Dropdown.Item disabled={isLoading}  onClick={()=>{
+        setSelectedProjectId(project.id!)
         setShowDeletModal(true)
       }}>
           <BsTrash className="me-2 text-danger" />
           Delete
         </Dropdown.Item>
-
+}
 
 
       </Dropdown.Menu>
@@ -347,8 +375,19 @@ if(!projectList) return <Loading/>
   </tbody>
 </table>
 
-{projectList.totalNumberOfPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPageNumber} onPageChange={setCurrentPage}/>}
+{totalPageNumber > 1 && <Pagination currentPage={currentPage} totalPages={totalPageNumber} onPageChange={setCurrentPage}/>}
+
+
+
+
+
+
+
 
     </div>
+
+
+
+
   )
 }

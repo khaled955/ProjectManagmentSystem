@@ -1,6 +1,5 @@
 
 import { useForm } from "react-hook-form";
-import photo from "../../../../assets/images/th.jpeg";
 import type { ChangePassInfoProps } from "../../../../Interfaces/Interfaces";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -80,7 +79,7 @@ export default function ChangePassword() {
 
 
   return (
-    <main className="rounded-2 py-2 px-4" aria-label="Reset Password Page">
+    <main className="rounded-2 py-2 px-4 col-md-6" aria-label="Reset Password Page">
       <section className="text mt-3" aria-labelledby="reset-heading">
         <p style={{ fontSize: 10 }} className="mb-0 text-white">
           Welcome to PMS
@@ -90,15 +89,7 @@ export default function ChangePassword() {
         </h1>
       </section>
 
-      <div className="img text-center">
-        <img
-          src={photo}
-          alt="Reset password illustration"
-          width={60}
-          height={60}
-          className="rounded-circle"
-        />
-      </div>
+    
 
       <form className="row mt-2 py-3" onSubmit={handleSubmit(changePassword)} noValidate>
         <fieldset className="col-md-12">

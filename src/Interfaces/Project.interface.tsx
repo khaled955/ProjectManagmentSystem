@@ -14,12 +14,12 @@ export interface Manager {
 }
 
 export interface Project {
-  id: number;
-  title: string;
-  description: string;
-  creationDate: string;
-  modificationDate: string;
-  manager: Manager;
+  id?: number;
+  title?: string;
+  description?: string;
+  creationDate?: string;
+  modificationDate?: string;
+  manager?: Manager;
 }
 
 export interface PaginatedProjectResponse {
@@ -45,4 +45,60 @@ export interface ProjectFormProps {
   handleHideProjectForm: () => void;
   handleCreateNewProject: (data: AddProjectProps) => Promise<void>;
   handleUpdateCurrentProject: (data: AddProjectProps) => Promise<void>;
+}
+
+
+
+ 
+
+
+
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: 'ToDo' | 'InProgress' | 'Done'; // adjust enum values if needed
+  creationDate: string;
+  modificationDate: string;
+}
+
+export interface ManagerProjectProps {
+  id?: number;
+  description?: string;
+  creationDate?: string;
+  modificationDate?: string;
+  task?: Task[];
+  title?:string;
+}
+
+
+
+
+
+export interface Employee {
+  id: number;
+  userName: string;
+  email: string;
+  phoneNumber: string;
+  country: string;
+  password: string;
+  imagePath: string | null;
+  isActivated: boolean;
+  isVerified: boolean;
+  creationDate: string;
+  modificationDate: string;
+  verificationCode: string;
+}
+
+
+
+
+
+export interface ProjectProps {
+ id?: number;
+  description?: string;
+  creationDate?: string;
+  modificationDate?: string;
+  task?: Task[];
+  title?:string;
 }

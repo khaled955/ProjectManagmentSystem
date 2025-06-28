@@ -2,11 +2,11 @@
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Link } from 'react-router-dom';
 import styles from "./MySideBar.module.css";
-import { useAuth } from '../../../../Context/Auth.context';
+import { useAuth } from '../../../../Hooks/useAuth';
 
 export default function MySideBar({ collapsed, handleCollapse }: { handleCollapse: () => void; collapsed: boolean }) {
 
-  const {logOut} = useAuth()
+  const {logOut,isEmployee} = useAuth()
   return (
     <div
       className={`side-bar-container vh-100 overflow-hidden`}
@@ -35,10 +35,13 @@ export default function MySideBar({ collapsed, handleCollapse }: { handleCollaps
             </div>
           </MenuItem>
           <MenuItem icon={<i className="fa-solid fa-house"></i>} component={<Link to="/dashboard" />}> Home</MenuItem>
-          <MenuItem icon={<i className="fa-solid fa-users"></i>} component={<Link to="/dashboard/users" />}> Users</MenuItem>
-          <MenuItem icon={<i className="fa-solid fa-chart-simple"></i>} component={<Link to="/dashboard/projects" />}> Projects</MenuItem>
-          <MenuItem icon={<i className="fa-solid fa-list-check"></i>} component={<Link to="/dashboard/tasks" />}> Tasks</MenuItem>
+
+{!isEmployee && <MenuItem icon={<i className="fa-solid fa-users"></i>} component={<Link to="/dashboard/users" />}> Users</MenuItem>}
+ <MenuItem icon={<i className="fa-solid fa-chart-simple"></i>} component={<Link to="/dashboard/projects" />}> Projects</MenuItem>
+{!isEmployee && <MenuItem icon={<i className="fa-solid fa-list-check"></i>} component={<Link to="/dashboard/tasks" />}> Tasks</MenuItem>}   
+{isEmployee && <MenuItem icon={<i className="fa-solid fa-list-check"></i>} component={<Link to="/dashboard/my-tasks" />}> MyTasks</MenuItem>}   
           <MenuItem icon={<i className="fa-solid fa-id-card"></i>} component={<Link to="/dashboard/profile" />}> Profile</MenuItem>
+          <MenuItem icon={<i className="fa-solid fa-lock"></i>} component={<Link to="/dashboard/change-password" />}> Change-Password</MenuItem>
           <MenuItem onClick={logOut} icon={<i className="fa-solid fa-right-from-bracket"></i>}> LogOut</MenuItem>
         </Menu>
       </Sidebar>

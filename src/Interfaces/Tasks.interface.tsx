@@ -73,3 +73,21 @@ export interface TaskFormProps {
   handleCreateNewTask: (data: AddTaskProps) => Promise<void>;
   handleUpdateCurrentTask: (data: AddTaskProps) => Promise<void>;
 }
+
+
+
+
+
+export interface TaskPropForDrag{
+   id: number;
+  title: string;
+  description: string;
+  status: string;
+}
+
+export  interface CoulmnPropsForDrag {
+  id:"ToDo" | "InProgress" |"Done";
+  title:"ToDo" | "InProgress" |"Done";
+}
+
+

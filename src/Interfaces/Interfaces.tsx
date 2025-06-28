@@ -1,3 +1,5 @@
+import type { UserInfo } from "./Profile.interface";
+
 export interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -58,6 +60,10 @@ export interface ChangePassInfoProps {
 export interface AuthContextProps {
   token:string| null ;
   setToken:(token:string|null)=>void;
+userInfo:UserInfo | null;
+fetchUser:()=>Promise<void>;
+updateProfileInfo: (info: ProfileData, onSuccess?: () => void) => Promise<void>;
+errorMessage:string | null
 }
 
 export interface UserTokenPayload {
@@ -68,4 +74,21 @@ export interface UserTokenPayload {
   userGroup: string;
   userId: number;
   userName: string;
+}
+
+
+
+
+
+
+
+export interface  ProfileData {
+  userName:string;
+  email:string;
+  country:string;
+  phoneNumber:string;
+  confirmPassword:string;
+profileImage:undefined
+
+
 }

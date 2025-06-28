@@ -15,6 +15,9 @@ import TasksDetails from '../TaskDetails/TasksDetails';
 import TaskForm from '../TaskForm/TaskForm';
 import type { AddTaskProps } from '../../../../Interfaces/Users.interface';
 import type { Task } from '../../../../Interfaces/Tasks.interface';
+import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";
+import { useAuth } from '../../../../Hooks/useAuth';
 
 
 
@@ -30,15 +33,15 @@ const [seletedTaskId , setSelectedTaskId] = useState< number | null>(null)
 const [searchQuery , setSearchQuery] = useState("")
 const [showTaskForm , setShowTaskForm] = useState(false)
 const [taskFormtitle , setTaskFormTitle] = useState("")
-
-
-
+const [status , setStatus] = useState("")
+const {isEmployee} = useAuth()
+const navigate = useNavigate()
 
 const fetchTasks = useCallback( async function(){
 
   try {
     const options = {
-      url:TASKS_URL.GET_ALL_MY_TASKS_FOR_MANAGER(10 , currentPage),
+      url:TASKS_URL.GET_ALL_TASKS_FOR_MANAGER_FOR_FILTER(5,currentPage,searchQuery,status),
       method: 'GET',
     }
     
@@ -62,15 +65,22 @@ const {data } = await axiosInstance.request(options)
 
 
 
-},[currentPage])
+},[currentPage,searchQuery,status])
 
 
 
 
-useEffect(()=>{
-fetchTasks()
-},[currentPage,fetchTasks])
+useEffect(() => {
+  const runEffect = async () => {
+    if (isEmployee) {
+      navigate("/dashboard");
+    } else {
+      await fetchTasks();
+    }
+  };
 
+  runEffect();
+}, [currentPage, fetchTasks, isEmployee, navigate]);
 
 
 
@@ -118,7 +128,7 @@ const debounceSearchByTitle= useMemo(()=>{
     if(searchQuery){
       fetchTasks()
     }
-  },300)
+  },100)
   
 
 
@@ -178,8 +188,7 @@ try {
     data:dataInfo
   }
 
-  const {data} = await axiosInstance.request(options)
-  console.log(data)
+   await axiosInstance.request(options)
 toast.success("New Task Created Successfully")
    await fetchTasks()
 } catch (error) {
@@ -207,7 +216,7 @@ const handleUpdateCurrentTask = useCallback( async (dataInfo:AddTaskProps)=>{
   if(!currentTask) return 
 
   // prevent callapi if no change happen
-if(dataInfo.title === currentTask.title && dataInfo.description === currentTask.description && dataInfo.employeeId.toString() === currentTask.employee.id.toString()
+if( currentTask && currentTask.project.id && dataInfo.title === currentTask.title && dataInfo.description === currentTask.description && dataInfo.employeeId.toString() === currentTask.employee.id.toString()
 && dataInfo.projectId.toString() === currentTask.project.id.toString()
 
 ){
@@ -268,7 +277,11 @@ function handleHideConfirmModal(){
 
 
 
+const handleFilterByStatus = useCallback( function(e:React.ChangeEvent<HTMLSelectElement>){
+ const value = e.target.value
+setStatus(value)
 
+},[])
 
 
 
@@ -277,110 +290,152 @@ function handleHideConfirmModal(){
 if(!taskList) return <Loading/>
 
   return (
-    <div>
-{showTaskDetails && currentTask && <TasksDetails currentTask={currentTask} handleHideTaskCard={handleHideTaskCard}/>
-}
 
-{showConfirmModal && seletedTaskId && <ConfirmModal onClose={handleHideConfirmModal} selectedId={seletedTaskId} show={showConfirmModal} isLoading={isLoading} onConfirm={deletTask}/>}
+<>
+  <Helmet>
+    <title>Tasks List | Project Management</title>
+    <meta name="description" content="Browse, filter, and manage tasks for your projects." />
+  </Helmet>
 
-{showTaskForm && <TaskForm handleCreateNewTask={handleCreateNewTask} handleUpdateCurrentTask={handleUpdateCurrentTask} taskFormtitle={taskFormtitle} handleHideTaskForm={handleHideTaskForm} currentTask={currentTask!}/>}
+  <main role="main" className="container">
+    {showTaskDetails && currentTask && (
+      <TasksDetails currentTask={currentTask} handleHideTaskCard={handleHideTaskCard} />
+    )}
 
+    {showConfirmModal && seletedTaskId && (
+      <ConfirmModal
+        onClose={handleHideConfirmModal}
+        selectedId={seletedTaskId}
+        show={showConfirmModal}
+        isLoading={isLoading}
+        onConfirm={deletTask}
+      />
+    )}
 
-      <div className="project-header px-2 rounded-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-       <h2>Tasks</h2>
-       <button onClick={()=>{
-        
-        setTaskFormTitle("Add a New Task")
-        setCurrentTask(null)
-        setShowTaskForm(true)
-       }} className="custom-btn"> + Add New Task</button>
+    {showTaskForm && (
+      <TaskForm
+        handleCreateNewTask={handleCreateNewTask}
+        handleUpdateCurrentTask={handleUpdateCurrentTask}
+        taskFormtitle={taskFormtitle}
+        handleHideTaskForm={handleHideTaskForm}
+        currentTask={currentTask!}
+      />
+    )}
+
+    <header className="project-header px-2 rounded-2 d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+      <h1>Tasks</h1>
+      <button
+        onClick={() => {
+          setTaskFormTitle("Add a New Task");
+          setCurrentTask(null);
+          setShowTaskForm(true);
+        }}
+        className="custom-btn"
+        aria-label="Add a new task"
+      >
+        + Add New Task
+      </button>
+    </header>
+
+    <section className="filter-box row gap-3 justify-content-center align-items-center" aria-label="Task Filters">
+      <div className="filter-name my-4 position-relative col-md-7">
+        <label htmlFor="taskSearch" className="visually-hidden">
+          Search Tasks by Title
+        </label>
+        <i className="fa-brands fa-searchengin position-absolute start-0 top-50 translate-middle-y ms-3" aria-hidden="true"></i>
+        <input
+          id="taskSearch"
+          value={searchQuery}
+          onChange={handleSearchQuertByTitle}
+          className="form-control px-5"
+          type="search"
+          placeholder="Search By Title"
+          aria-label="Search Tasks by Title"
+        />
       </div>
 
-<div className="filter-box my-4 position-relative">
-  <i className="fa-brands fa-searchengin position-absolute start-0 top-50 translate-middle-y ms-3"></i>
-  <input value={searchQuery} onChange={handleSearchQuertByTitle} className="form-control px-5" type="search"  placeholder="Search By Title"/>
-</div>
-{/*  table to display projects */}
+      <div className="filter-status my-4 position-relative col-md-2">
+        <label htmlFor="statusFilter" className="visually-hidden">
+          Filter by Status
+        </label>
+        <select
+          id="statusFilter"
+          className="form-control"
+          defaultValue={status}
+          onChange={handleFilterByStatus}
+          aria-label="Filter by task status"
+        >
+          <option disabled value=""> Filter By Status</option>
+          <option value=""> All Status</option>
+          <option value="ToDo">ToDo</option>
+          <option value="InProgress">InProgress</option>
+          <option value="Done"> Done</option>
+        </select>
+      </div>
+    </section>
 
-<table className="table table-responsive text-center">
-  <thead>
-    <tr  >
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Title</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Status</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>User</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Email</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Project</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Created Date</th>
-      <th style={{backgroundColor:"#315951E5" ,color:"white"}}>Action</th>
-    </tr>
-  </thead>
-  <tbody>
- {taskList.length > 0 ?taskList.map((task:Task)=> <tr key={task.id}>
+    <section aria-label="Task Table">
+      <div className="table-responsive">
+        <table className="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Status</th>
+              <th scope="col">User</th>
+              <th scope="col">Email</th>
+              <th scope="col">Project</th>
+              <th scope="col">Created Date</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {taskList.length > 0 ? (
+              taskList.map((task) => (
+                <tr key={task.id}>
+                  <td className="text-capitalize">{task.title}</td>
+                  <td style={{ backgroundColor: "#315951E5", color: "white", borderRadius: 20 }}>{task.status}</td>
+                  <td>{task.employee.userName}</td>
+                  <td>{task.employee.email}</td>
+                  <td>{task.project.title}</td>
+                  <td>{new Date(task.creationDate).toLocaleDateString()}</td>
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle as="button" className="btn btn-link p-0 border-0" id="dropdown-custom-button" aria-label="Task actions menu">
+                        <BsThreeDotsVertical />
+                      </Dropdown.Toggle>
 
+                      <Dropdown.Menu className="shadow-sm rounded-3">
+                        <Dropdown.Item onClick={() => { setCurrentTask(task); setShowTaskDetails(true); }}>
+                          <BsEye className="me-2 text-success" /> View
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => { setCurrentTask(task); setTaskFormTitle(`Update ${task.title}`); setShowTaskForm(true); }}>
+                          <BsPencil className="me-2 text-primary" /> Edit
+                        </Dropdown.Item>
+                        <Dropdown.Item disabled={isLoading} onClick={() => { setSelectedTaskId(task.id); setShowConfirmModal(true); }}>
+                          <BsTrash className="me-2 text-danger" /> Delete
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className='text-center' colSpan={7}><NoData message="No Tasks Found" /></td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-  <td className='text-capitalize'>{task.title}</td>
-  <td style={{backgroundColor:"#315951E5" ,color:"white",borderRadius:20}}>{task.status}</td>
-  <td>{task.employee.userName}</td>
-  <td>{task.employee.email}</td>
-  <td>{task.project.title}</td>
-  <td>{new Date(task.creationDate).toLocaleTimeString()}</td>
-  <td> 
-<Dropdown>
-      <Dropdown.Toggle
-        as="button"
-        className="btn btn-link p-0 border-0"
-        id="dropdown-custom-button"
-      >
-        <BsThreeDotsVertical />
-      </Dropdown.Toggle>
+    {totalPageNumber > 1 && (
+      <nav aria-label="Task Pagination">
+        <Pagination currentPage={currentPage} totalPages={totalPageNumber} onPageChange={setCurrentPage} />
+      </nav>
+    )}
+  </main>
+</>
 
-      <Dropdown.Menu className="shadow-sm rounded-3">
-
-{/*  view btn */}
-        <Dropdown.Item onClick={()=>{setCurrentTask(task)
-          setShowTaskDetails(true)
-
-        }} >
-          <BsEye className="me-2 text-success" />
-          View
-        </Dropdown.Item>
-
-        
-
- 
-
- {/* edit btn */}
-        <Dropdown.Item onClick={()=>{
-          setCurrentTask(task)
-          setTaskFormTitle(`Update ${task.title}`)
-          setShowTaskForm(true)
-        }} >
-          <BsPencil className="me-2 text-primary" />
-          Edit
-        </Dropdown.Item>
-
-{/* delet btn */}
-      <Dropdown.Item disabled={isLoading}  onClick={()=>{
-        setSelectedTaskId(task.id)
-        setShowConfirmModal(true)
-      }}>
-          <BsTrash className="me-2 text-danger" />
-          Delete
-        </Dropdown.Item>
-
-
-
-      </Dropdown.Menu>
-    </Dropdown>
-
-
-  </td>
- </tr>):<NoData message='No Tasks Found'/>}
-  </tbody>
-</table>
-
-{totalPageNumber > 1 && <Pagination currentPage={currentPage} totalPages={totalPageNumber} onPageChange={setCurrentPage}/>}
-
-    </div>
   )
 }

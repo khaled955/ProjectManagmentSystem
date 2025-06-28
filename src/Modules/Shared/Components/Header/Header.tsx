@@ -1,4 +1,4 @@
-import { useAuth } from "../../../../Context/Auth.context"
+import { useAuth } from "../../../../Hooks/useAuth"
 import styles from "./Header.module.css"
 export default function Header({headerText="Hello From Header Component"}:{headerText:string}) {
   const {tokenDecoded} = useAuth()

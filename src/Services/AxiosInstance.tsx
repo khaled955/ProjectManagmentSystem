@@ -19,16 +19,16 @@ axiosInstance.interceptors.request.use(
 );
 
 // Optional: Response interceptor (e.g., for handling 401 errors globally)
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      // Optional: redirect to login or handle token expiration
-      console.log('Unauthorized - redirecting to login');
-      window.location.href = "/login"
-    }
-    return Promise.reject(error);
-  }
-);
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       // Optional: redirect to login or handle token expiration
+//       console.log('Unauthorized - redirecting to login');
+//       window.location.href = "/login"
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default axiosInstance;
